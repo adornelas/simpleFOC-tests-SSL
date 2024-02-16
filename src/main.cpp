@@ -8,19 +8,13 @@
  */
 #include <SimpleFOC.h>
 
-// magnetic sensor instance - SPI
-MagneticSensorSPI sensor = MagneticSensorSPI(AS5147_SPI, 10);
-// magnetic sensor instance - I2C
-// MagneticSensorI2C sensor = MagneticSensorI2C(AS5600_I2C);
-// magnetic sensor instance - analog output
-// MagneticSensorAnalog sensor = MagneticSensorAnalog(A1, 14, 1020);
+// magnetic sensor instance - PWM
+MagneticSensorPWM sensor = MagneticSensorPWM(GPIO_NUM_22, 2, 922);
+void doPWM(){sensor.handlePWM();}
 
 // BLDC motor & driver instance
 BLDCMotor motor = BLDCMotor(11);
-BLDCDriver3PWM driver = BLDCDriver3PWM(9, 5, 6, 8);
-// Stepper motor & driver instance
-//StepperMotor motor = StepperMotor(50);
-//StepperDriver4PWM driver = StepperDriver4PWM(9, 5, 10, 6,  8);
+BLDCDriver3PWM driver = BLDCDriver3PWM(GPIO_NUM_19, GPIO_NUM_18, GPIO_NUM_5, GPIO_NUM_17);
 
 // voltage set point variable
 float target_voltage = 2;
@@ -29,9 +23,14 @@ Commander command = Commander(Serial);
 void doTarget(char* cmd) { command.scalar(&target_voltage, cmd); }
 
 void setup() {
+  pinMode(GPIO_NUM_23, OUTPUT);
+  digitalWrite(GPIO_NUM_23, HIGH);
 
   // initialise magnetic sensor hardware
   sensor.init();
+  // hardware interrupt enable
+  sensor.enableInterrupt(doPWM);
+  
   // link the motor to the sensor
   motor.linkSensor(&sensor);
 
@@ -41,7 +40,7 @@ void setup() {
   motor.linkDriver(&driver);
 
   // aligning voltage 
-  motor.voltage_sensor_align = 5;
+  motor.voltage_sensor_align = 1;
   // choose FOC modulation (optional)
   motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
   // set motion control loop to be used
