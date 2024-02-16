@@ -16,6 +16,8 @@ void doTarget(char* cmd) { command.scalar(&target_velocity, cmd); }
 void doLimit(char* cmd) { command.scalar(&motor.voltage_limit, cmd); }
 
 void setup() {
+  pinMode(GPIO_NUM_23, OUTPUT);
+  digitalWrite(GPIO_NUM_23, HIGH);
 
   // driver config
   // power supply voltage [V]
