@@ -10,12 +10,13 @@
 #include <SimpleFOC.h>
 
 // magnetic sensor instance - PWM
-MagneticSensorPWM sensor = MagneticSensorPWM(GPIO_NUM_22, 2, 922);
+MagneticSensorPWM sensor = MagneticSensorPWM(GPIO_NUM_15, 2, 922);
 void doPWM(){sensor.handlePWM();}
 
 // BLDC motor & driver instance
 BLDCMotor motor = BLDCMotor(11);
-BLDCDriver3PWM driver = BLDCDriver3PWM(GPIO_NUM_19, GPIO_NUM_18, GPIO_NUM_5, GPIO_NUM_17);
+BLDCDriver3PWM driver = BLDCDriver3PWM(GPIO_NUM_13, GPIO_NUM_12, GPIO_NUM_14, GPIO_NUM_27);
+
 
 // angle set point variable
 float target_angle = 0;
