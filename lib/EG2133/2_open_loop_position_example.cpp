@@ -1,60 +1,117 @@
-// MKS DUAL FOC open-loop position control routine.Test library: SimpleFOC 2.1.1 Test hardware: MKS DUAL FOC V3.1
-// Input "T+number" in the serial port to set the position of the two motors, such as setting the motor to turn to 180 degrees, input "T3.14" (180 degrees in radian system)
-// When using your own motor, please remember to modify the default number of pole pairs, that is, the value in BLDCMotor(7), and set it to your own number of pole pairs
-// The default power supply voltage set by the program is 12V, please remember to modify the values in voltage_power_supply and voltage_limit variables if you use other voltages for power supply
-
+/**
+ *
+ * Position/angle motion control example
+ * Steps:
+ * 1) Configure the motor and magnetic sensor
+ * 2) Run the code
+ * 3) Set the target angle (in radians) from serial terminal
+ *
+ */
 #include <SimpleFOC.h>
 
-BLDCMotor motor = BLDCMotor(7);
-BLDCDriver3PWM driver = BLDCDriver3PWM(32, 33, 25, 22);
+// magnetic sensor instance - PWM
+MagneticSensorPWM sensor = MagneticSensorPWM(GPIO_NUM_15, 2, 922);
+void doPWM(){sensor.handlePWM();}
 
-BLDCMotor motor1 = BLDCMotor(7);
-BLDCDriver3PWM driver1 = BLDCDriver3PWM(26, 27, 14, 12);
+// BLDC motor & driver instance
+BLDCMotor motor = BLDCMotor(11);
+// BLDCDriver3PWM driver = BLDCDriver3PWM(GPIO_NUM_32, GPIO_NUM_33, GPIO_NUM_25, GPIO_NUM_27);
+BLDCDriver3PWM driver = BLDCDriver3PWM(GPIO_NUM_13, GPIO_NUM_12, GPIO_NUM_14, GPIO_NUM_27);
 
-//Target variable
-float target_velocity = 0;
 
-//Serial command setting
+// angle set point variable
+float target_angle = 0;
+// instantiate the commander
 Commander command = Commander(Serial);
-void doTarget(char* cmd) { command.scalar(&target_velocity, cmd); }
+void doTarget(char* cmd) { command.scalar(&target_angle, cmd); }
 
 void setup() {
+  // pinMode(GPIO_NUM_23, OUTPUT);
+  // digitalWrite(GPIO_NUM_23, HIGH);
+  SimpleFOCDebug::enable();
 
-  driver.voltage_power_supply = 12;
-  driver.init();
-  motor.linkDriver(&driver);
-  motor.voltage_limit = 12;   // [V]
-  motor.velocity_limit = 15; // [rad/s]
+
+  // initialise magnetic sensor hardware
+  sensor.init();
+  // hardware interrupt enable
+  sensor.enableInterrupt(doPWM);
   
-  driver1.voltage_power_supply = 12;
-  driver1.init();
-  motor1.linkDriver(&driver1);
-  motor1.voltage_limit = 12;   // [V]
-  motor1.velocity_limit = 15; // [rad/s]
+  // link the motor to the sensor
+  motor.linkSensor(&sensor);
 
- 
-  //Open loop control mode setting
+  // driver config
+  // power supply voltage [V]
+  driver.voltage_power_supply = 12;
+  driver.voltage_limit = 6;
+
+  driver.init();
+  // link the motor and the driver
+  motor.linkDriver(&driver);
+
+  // choose FOC modulation (optional)
+  motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
+
+  // set motion control loop to be used
   motor.controller = MotionControlType::angle_openloop;
-  motor1.controller = MotionControlType::angle_openloop;
 
-  //Initialize the hardware
-  motor.init();
-  motor1.init();
+  // contoller configuration
+  // default parameters in defaults.h
 
+  // velocity PI controller parameters
+  motor.PID_velocity.P = 0.2f;
+  motor.PID_velocity.I = 20;
+  motor.PID_velocity.D = 0;
+  // maximal voltage to be set to the motor
+  motor.voltage_limit = 6;
 
-  //Add T command
-  command.add('T', doTarget, "target velocity");
+  // velocity low pass filtering time constant
+  // the lower the less filtered
+  motor.LPF_velocity.Tf = 0.01f;
 
+  // angle P controller
+  motor.P_angle.P = 20;
+  // maximal velocity of the position control
+  motor.velocity_limit = 10;
+
+  // use monitoring with serial
   Serial.begin(115200);
-  Serial.println("Motor ready!");
-  Serial.println("Set target velocity [rad/s]");
+  // comment out if not needed
+  // motor.useMonitoring(Serial);
+
+
+  // initialize motor
+  motor.init();
+  // align sensor and start FOC
+  motor.initFOC();
+
+  // add target command T
+  command.add('T', doTarget, "target angle");
+
+  Serial.println(F("Motor ready."));
+  Serial.println(F("Set the target angle using serial terminal:"));
   _delay(1000);
 }
 
-void loop() {
-  motor.move(target_velocity);
-  motor1.move(target_velocity);
 
-  //User newsletter
+void loop() {
+
+  // main FOC algorithm function
+  // the faster you run this function the better
+  // Arduino UNO loop  ~1kHz
+  // Bluepill loop ~10kHz
+  motor.loopFOC();
+
+  // Motion control function
+  // velocity, position or voltage (defined in motor.controller)
+  // this function can be run at much lower frequency than loopFOC() function
+  // You can also use motor.move() and set the motor.target in the code
+  motor.move(target_angle);
+
+
+  // function intended to be used with serial plotter to monitor motor variables
+  // significantly slowing the execution down!!!!
+  // motor.monitor();
+
+  // user communication
   command.run();
 }
