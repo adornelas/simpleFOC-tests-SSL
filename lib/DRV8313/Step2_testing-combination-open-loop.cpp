@@ -2,10 +2,12 @@
 #include <SimpleFOC.h>
 
 // BLDC motor & driver instance
-MagneticSensorPWM sensor = MagneticSensorPWM(GPIO_NUM_22, 2, 922);
+MagneticSensorPWM sensor = MagneticSensorPWM(GPIO_NUM_15, 2, 922);
 void doPWM(){sensor.handlePWM();}
+
 BLDCMotor motor = BLDCMotor(11);
-BLDCDriver3PWM driver = BLDCDriver3PWM(GPIO_NUM_19, GPIO_NUM_18, GPIO_NUM_5, GPIO_NUM_17);
+BLDCDriver3PWM driver = BLDCDriver3PWM(32, 33, 25, 22);
+
 
 //target variable
 float target_velocity = 0;
@@ -16,9 +18,6 @@ void doTarget(char* cmd) { command.scalar(&target_velocity, cmd); }
 void doLimit(char* cmd) { command.scalar(&motor.voltage_limit, cmd); }
 
 void setup() {
-  pinMode(GPIO_NUM_23, OUTPUT);
-  digitalWrite(GPIO_NUM_23, HIGH);
-
   // driver config
   // power supply voltage [V]
   driver.voltage_power_supply = 12;

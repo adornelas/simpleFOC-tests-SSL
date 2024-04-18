@@ -15,7 +15,8 @@ void doPWM(){sensor.handlePWM();}
 
 // BLDC motor & driver instance
 BLDCMotor motor = BLDCMotor(11);
-BLDCDriver3PWM driver = BLDCDriver3PWM(GPIO_NUM_13, GPIO_NUM_12, GPIO_NUM_14, GPIO_NUM_27);
+BLDCDriver3PWM driver = BLDCDriver3PWM(32, 33, 25, 22);
+
 
 
 // angle set point variable
@@ -25,9 +26,6 @@ Commander command = Commander(Serial);
 void doTarget(char* cmd) { command.scalar(&target_angle, cmd); }
 
 void setup() {
-  pinMode(GPIO_NUM_23, OUTPUT);
-  digitalWrite(GPIO_NUM_23, HIGH);
-
   // initialise magnetic sensor hardware
   sensor.init();
   // hardware interrupt enable
