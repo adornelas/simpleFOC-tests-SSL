@@ -9,6 +9,9 @@ Tests on FOC library for BLDC motors to be used on the robots of the SSL categor
 Test codes are inside [lib folder](/lib), where [utils](/lib/utils) should help calibrating the motor, sensors and drivers. If you are using new motors and sensors you must do this routine to calibrate them.
 
 ### Testing codes
+
+In order to test the codes, you should copy the code.cpp inside the lib folder and paste it on [main.cpp file](src/main.cpp) 
+
 #### DRV8313 (mini FOC)
 
 Into [DRV8313](lib/DRV8313) folder you should be able to test each component seperately when using this chip.  
