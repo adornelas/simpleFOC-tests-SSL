@@ -35,6 +35,10 @@ When using the MKS DUAL FOC PLUS, the pins are also fixed with the esp32 shilded
 
 Following the steps inside the lib you should be able to fully control velocity or angle on a closed loop control for both methods.
 
+#### Collecting data
+
+[Colect serial](colect_serial.py) (UNTESTED) should read data from the serial and save them into a .json file for analisis purpose 
+
 ## References
 
 ### Main library:
