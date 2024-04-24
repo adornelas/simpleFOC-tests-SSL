@@ -1,11 +1,10 @@
 #include <SimpleFOC.h>
 
+// REMEMBER TO CHECK GPIO NUM
 MagneticSensorPWM sensor = MagneticSensorPWM(GPIO_NUM_22, 2, 922);
 void doPWM(){sensor.handlePWM();}
 
 void setup() {
-  pinMode(GPIO_NUM_23, OUTPUT);
-  digitalWrite(GPIO_NUM_23, HIGH);
   // monitoring port
   Serial.begin(115200);
   
