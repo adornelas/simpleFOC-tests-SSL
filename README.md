@@ -2,6 +2,36 @@
 
 Tests on FOC library for BLDC motors to be used on the robots of the SSL category at the UnBall team
 
+## Usage
+
+### Calibration
+
+Test codes are inside [lib folder](/lib), where [utils](/lib/utils) should help calibrating the motor, sensors and drivers. If you are using new motors and sensors you must do this routine to calibrate them.
+
+### Testing codes
+#### DRV8313 (mini FOC)
+
+Into [DRV8313](lib/DRV8313) folder you should be able to test each component seperately when using this chip.  
+
+**Please check the pins you are using and put the correct GPIO_NUM at the object constructor for the sensor and the motor.**
+
+Following the steps inside the lib you should be able to fully control velocity or angle on a closed loop control.
+
+#### EG2133
+
+Into [EG2133](lib/EG2133) folder you should be able to test each component seperately when using this chip.  
+
+**Note 1:  
+Please note that this board is able to control two motors at the same time. So if anything goes wrong, you should test it using only one motor before continuing.**
+
+**Note 2:  
+If you are using the MKS ESP32 FOC the pins for the motors are fixed, so you should not change them, only do it for the sensors. When using PWM for the sensors, you must use the I_0 and I_1 external ports to connect**
+
+**Note 3:
+When using the MKS DUAL FOC PLUS, the pins are also fixed with the esp32 shilded onto the board, but you can also use jumpers to connect an external not-shielded version, just make sure you read the documentation on which pins are connected on the board.**
+
+Following the steps inside the lib you should be able to fully control velocity or angle on a closed loop control for both methods.
+
 ## References
 
 ### Main library:
