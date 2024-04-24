@@ -22,5 +22,6 @@ void setup() {
 
 void loop() {
     // setting pwm (A: 3V, B: 1V, C: 5V)
+    // When measuring the voltage on each phase with a multimeter you should get these values
     driver.setPwm(3,1,5);
 }
