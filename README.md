@@ -25,7 +25,7 @@ Into [EG2133](lib/EG2133) folder you should be able to test each component seper
 Please note that this board is able to control two motors at the same time. So if anything goes wrong, you should test it using only one motor before continuing.**
 
 **Note 2:  
-If you are using the MKS ESP32 FOC the pins for the motors are fixed, so you should not change them, only do it for the sensors. When using PWM for the sensors, you must use the I_0 and I_1 external ports to connect**
+If you are using the MKS ESP32 FOC the pins for the motors are fixed, so you should not change them, only do it for the sensors. When using PWM for the sensors, you must use the I_0(GPIO_NUM_15) and I_1(GPIO_NUM_13) external ports to connect**
 
 **Note 3:
 When using the MKS DUAL FOC PLUS, the pins are also fixed with the esp32 shilded onto the board, but you can also use jumpers to connect an external not-shielded version, just make sure you read the documentation on which pins are connected on the board.**
